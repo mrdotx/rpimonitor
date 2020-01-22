@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+#
+# web.status.1.content.1.line.1=InsertHTML("/addons/top/top.html")
+#
+my $process='rpimonitor';
+my $web=1;
+my $nbtop=3;
+my @top=[];
+my $monitored;
+
+#Get uptime
+my $uptime;
+open ( FILE, "/proc/uptime") or die "Can't open /proc/uptime \n";
+while (<FILE>){
+  /(\S+) \S+/;
+  $uptime = $_;
+}
+
+my $idx=0;
+open (PS, 'ps -e -o etimes,time,comm --sort -time |') or die;
+while (<PS>)
+{
+  /TIME/ and next;
+  $idx++;
+  /$process/ and $monitored->{'idx'} ||= $idx;
+  /$process/ or $idx <= $nbtop or next;
+  /(\S+) (\S+):(\S+):(\S+) (\S+)/;
+  $1 or next;
+  my $start=100*($2*60*60+$3*60+$4)/$1;
+  my $total=100*($2*60*60+$3*60+$4)/$uptime;
+  $web
+  and $top[$idx] = sprintf("<tr height=20><td>%3d</td><td>%02d:%02d:%02d</td><td>%-12s</td><td>( %.2f% / %.2f% )</td></tr>\n",$idx, $2, $3, $4, $5, $start, $total)
+  or $top[$idx] = sprintf("%3d %02d:%02d:%02d %-12s ( %.2f% / %.2f% ) \n",$idx, $2, $3, $4, $5, $start, $total);
+}
+close PS or die;
+my $iloop;
+
+  $web
+  and print "<table width=100%>\n"
+  and print "<tr height=20><th width=100><b>#</b></th><th><b>CPU usage</b></th><th><b>Process</b></th><th><b>% start / total</b></th></tr>\n";
+  for ($iloop=1; $iloop<=$nbtop; $iloop++)
+  {
+    print $top[$iloop];
+  }
+  if ($iloop < $monitored->{'idx'}){
+    $web
+    and print "<tr height=20><td></td><td colspan='3'>...</td></tr>\n"
+    or print "    ...\n";
+  }
+  if ($iloop <= $monitored->{'idx'}){
+    print $top[$monitored->{'idx'}];
+  }
+  $web
+  and print "</table>\n";
