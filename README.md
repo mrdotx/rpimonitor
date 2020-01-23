@@ -1,5 +1,5 @@
 # rpimonitor
 
-configuration files for rpi-monitor
+config files for rpi-monitor
 
 ![](screenshot.png)
