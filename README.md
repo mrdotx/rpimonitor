@@ -2,4 +2,4 @@
 
 configuration files for rpi-monitor
 
-![](screenshot.jpg)
+![](screenshot.png)
