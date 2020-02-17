@@ -4,7 +4,7 @@
 #
 my $process='rpimonitor';
 my $web=1;
-my $nbtop=3;
+my $nbtop=5;
 my @top=[];
 my $monitored;
 
