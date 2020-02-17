@@ -1,0 +1,9 @@
+[Unit]
+Description=extract top x processes for rpi-monitor
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c 'while true; do cd /usr/share/rpimonitor/web/addons/top || exit 1; ./top > top.html; sleep 60; done'
+
+[Install]
+WantedBy=multi-user.target
